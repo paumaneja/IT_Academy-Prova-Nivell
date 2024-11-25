@@ -1,46 +1,40 @@
 package scape.view;
 
 import scape.enums.DifficultyLevel;
+import scape.enums.MaterialType;
+import scape.enums.ThemeType;
 import scape.exceptions.RoomDuplicatedException;
+import scape.exceptions.RoomNotFoundException;
 import scape.management.InventoryManager;
-import scape.models.Room;
+import scape.models.Clue;
+import scape.models.Decoration;
 import scape.utils.InputUtils;
 
-import java.util.Optional;
 import java.util.Scanner;
 
 public class Menu {
 
-    public static void startMenu(){
+    private static final InventoryManager inventoryManager = new InventoryManager();
 
-        InventoryManager inventoryManager = new InventoryManager();
+    public static void startMenu(){
 
         boolean exit = false;
         do {
                 switch (menu()) {
                     case 1:
-                        String name = InputUtils.readString("Name of the room: ");
-                        DifficultyLevel level = InputUtils.readEnum("Difficulty level: ", DifficultyLevel.class);
-                        try {
-                            inventoryManager.createRoom(name, level);
-                        } catch (RoomDuplicatedException e){
-                            System.out.printf(e.getMessage());
-                        }
+                        createRoom();
                         break;
                     case 2:
-                        name = InputUtils.readString("Name of the room: ");
-
-
-                        //controller.createClue();
+                        addClueToRoom();
                         break;
                     case 3:
-                        //controller.addClueToRoom();
+                        addDecorationToRoom();
                         break;
                     case 4:
-                        //controller.createDecoration();
+                        inventoryManager.showInventory();
                         break;
                     case 5:
-                        //controller.addDecoToRoom();
+                        removeItemFromRoom();
                         break;
                     case 0:
                         System.out.println("Finishing the program...");
@@ -70,5 +64,52 @@ public class Menu {
             }
         } while (option < MINIMO || option > MAXIMO);
         return option;
+    }
+
+    public static void createRoom() {
+        String name = InputUtils.readString("Enter room name: ");
+        DifficultyLevel level = InputUtils.readEnum("Enter room difficulty (EASY, MEDIUM, HARD): ", DifficultyLevel.class);
+        try {
+            inventoryManager.createRoom(name, level);
+        } catch (RoomDuplicatedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void addClueToRoom() {
+        String roomName = InputUtils.readString("Enter the room name to add a clue: ");
+        String clueName = InputUtils.readString("Enter clue name: ");
+        ThemeType theme = InputUtils.readEnum("Enter clue theme (HISTORY, SCIENCE, MYSTERY): ", ThemeType.class);
+        int timeToSolve = InputUtils.readInt("Enter time to solve (in minutes): ");
+        double price = InputUtils.readDouble("Enter clue price: ");
+        Clue clue = new Clue(clueName, theme, timeToSolve, price);
+        try {
+            inventoryManager.addClueToRoom(roomName, clue);
+        } catch (RoomNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void addDecorationToRoom() {
+        String roomName = InputUtils.readString("Enter the room name to add a decoration: ");
+        String decorationName = InputUtils.readString("Enter decoration name: ");
+        MaterialType material = InputUtils.readEnum("Enter material type (WOOD, METAL, GLASS): ", MaterialType.class);
+        double price = InputUtils.readDouble("Enter decoration price: ");
+        Decoration decoration = new Decoration(decorationName, price, material);
+        try {
+            inventoryManager.addDecorationToRoom(roomName, decoration);
+        } catch (RoomNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void removeItemFromRoom() {
+        String roomName = InputUtils.readString("Enter the room name to remove an item: ");
+        String itemName = InputUtils.readString("Enter the item name to remove: ");
+        try {
+            inventoryManager.removeItemFromRoom(roomName, itemName);
+        } catch (RoomNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

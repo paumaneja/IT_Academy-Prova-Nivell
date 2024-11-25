@@ -14,7 +14,4 @@ public enum VAT {
         return tax;
     }
 
-    public double calculateTotalPriceWithTax(double price) {
-        return price * (1 + tax);
-    }
 }

@@ -110,9 +110,9 @@ public class InputUtils {
             } catch (InputMismatchException e) {
                 System.err.println("Format error. Please, try again.");
                 input.nextLine();
-            }/* finally {
+            } finally {
                 input.nextLine();
-            }*/
+            }
         }
         return selectedValue;
     }
